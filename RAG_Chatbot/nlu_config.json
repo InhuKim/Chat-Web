@@ -1,0 +1,6 @@
+{
+    "model_name" : "klue/roberta-base",
+    "max_seq_len" : 128,
+    "out_features" : 10,
+    "model_path" : "/home/RAG_Chatbot/Agent/RoBERTa-base_AdamW_baseline_example.pth"
+}
