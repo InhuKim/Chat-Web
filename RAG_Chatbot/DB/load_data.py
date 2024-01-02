@@ -18,7 +18,6 @@ def main(
     documents = []
     metadatas = []
 
-
     data = CSVLoader(documents_directory,
                      source_column='text',
                      metadata_columns=['label', 'search_query'])
@@ -31,12 +30,8 @@ def main(
         temp_df['query'] = value.metadata['search_query']
         metadatas.append(temp_df)
 
-    # Instantiate a persistent chroma client in the persist_directory.
-    # Learn more at docs.trychroma.com
     client = chromadb.PersistentClient(path=persist_directory)
 
-    # If the collection already exists, we just return it. This allows us to add more
-    # data to an existing collection.
     sentence_transformer_ef = embedding_functions.SentenceTransformerEmbeddingFunction(model_name="paraphrase-multilingual-mpnet-base-v2")
     collection = client.get_or_create_collection(name=collection_name, embedding_function=sentence_transformer_ef)
 
@@ -45,7 +40,6 @@ def main(
     print(f"Collection already contains {count} documents")
     ids = [str(i) for i in range(count, count + len(documents))]
 
-    # Load the documents in batches of 100
     for i in tqdm(range(len(documents))):
         collection.add(
             ids=ids[i],

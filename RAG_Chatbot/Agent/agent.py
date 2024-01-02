@@ -25,7 +25,10 @@ from transformers import AutoTokenizer, RobertaModel, RobertaConfig, AutoModelFo
 class RAG_DB():
     def __init__(self, persist_path, collection_name):
         clinet = chromadb.PersistentClient(path=persist_path)
-        sentence_transformer_ef = embedding_functions.SentenceTransformerEmbeddingFunction(model_name="paraphrase-multilingual-mpnet-base-v2")
+        sentence_transformer_ef = embedding_functions.SentenceTransformerEmbeddingFunction(
+            model_name="paraphrase-multilingual-mpnet-base-v2"
+            )
+        
         self.collection = clinet.get_or_create_collection(name=collection_name, embedding_function=sentence_transformer_ef)
 
     def semantic_query(self, query):
@@ -82,14 +85,11 @@ class RoBERTa(nn.Module):
             nn.LeakyReLU(),
             nn.Linear(in_features=384, out_features=config['out_features']),
         )
-        # self.parsing_dict = label
 
     def forward(self, ids, masks):
         _, x = self.bert(input_ids= ids, attention_mask=masks, return_dict=False)
         logit = self.classifier(x)
-        # output = logit.argmax(1).detach().cpu().numpy().tolist()
 
-        # return [self.parsing_dict[i] for i in output][0]
         return logit
 
 class NLU_CustomLLM(LLM):
@@ -98,8 +98,6 @@ class NLU_CustomLLM(LLM):
     label : Dict = Field(None, alias="label dictionary")
     model : Any = None
     tokenizer : Any = None
-    # out_features : int = Field(None, alias="classification count")
-
 
     def __init__(self, CFG: Dict, label: Dict):
         super(NLU_CustomLLM, self).__init__()
@@ -108,7 +106,6 @@ class NLU_CustomLLM(LLM):
         self.label : Dict = label
 
         self.model : Any = RoBERTa(self.CFG)
-        # self.model = model.load_state_dict(torch.load(CFG['model_path'], map_location=device))
         self.tokenizer : Any = RoBERT_Tokenizer(self.CFG)
 
 
@@ -131,13 +128,6 @@ class NLU_CustomLLM(LLM):
     ) -> str:
         if stop is not None:
             raise ValueError("stop kwargs are not permitted.")
-
-        # device = torch.device('cuda') if torch.cuda.is_available() else torch.device('cpu')
-        
-        # tokenizer = RoBERT_Tokenizer(CFG)
-        # model = RoBERTa(CFG, label)
-
-        # .pth 파일 경로 체크
         
         inputs = self.tokenizer.encode(prompt)
         logit = self.model(inputs[0], inputs[1])
